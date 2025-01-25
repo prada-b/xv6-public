@@ -10,7 +10,7 @@
 void
 printf(int fd, const char *s, ...)
 {
-  write(fd, s, strlen(s));
+  xv6_write(fd, s, strlen(s));
 }
 
 void
@@ -21,28 +21,28 @@ forktest(void)
   printf(1, "fork test\n");
 
   for(n=0; n<N; n++){
-    pid = fork();
+    pid = xv6_fork();
     if(pid < 0)
       break;
     if(pid == 0)
-      exit();
+      xv6_exit();
   }
 
   if(n == N){
     printf(1, "fork claimed to work N times!\n", N);
-    exit();
+    xv6_exit();
   }
 
   for(; n > 0; n--){
-    if(wait() < 0){
+    if(xv6_wait() < 0){
       printf(1, "wait stopped early\n");
-      exit();
+      xv6_exit();
     }
   }
 
-  if(wait() != -1){
+  if(xv6_wait() != -1){
     printf(1, "wait got too many\n");
-    exit();
+    xv6_exit();
   }
 
   printf(1, "fork test OK\n");
@@ -52,5 +52,5 @@ int
 main(void)
 {
   forktest();
-  exit();
+  xv6_exit();
 }

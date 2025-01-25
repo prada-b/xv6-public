@@ -9,15 +9,15 @@ main(int argc, char *argv[])
 
   if(argc < 2){
     printf(2, "Usage: rm files...\n");
-    exit();
+    xv6_exit();
   }
 
   for(i = 1; i < argc; i++){
-    if(unlink(argv[i]) < 0){
+    if(xv6_unlink(argv[i]) < 0){
       printf(2, "rm: %s failed to delete\n", argv[i]);
       break;
     }
   }
 
-  exit();
+  xv6_exit();
 }

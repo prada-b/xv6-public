@@ -2,8 +2,8 @@
 #include "traps.h"
 
 #define SYSCALL(name) \
-  .globl name; \
-  name: \
+  .globl xv6_ ## name; \
+  xv6_ ## name: \
     movl $SYS_ ## name, %eax; \
     int $T_SYSCALL; \
     ret

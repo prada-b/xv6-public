@@ -14,7 +14,7 @@ grep(char *pattern, int fd)
   char *p, *q;
 
   m = 0;
-  while((n = read(fd, buf+m, sizeof(buf)-m-1)) > 0){
+  while((n = xv6_read(fd, buf+m, sizeof(buf)-m-1)) > 0){
     m += n;
     buf[m] = '\0';
     p = buf;
@@ -22,7 +22,7 @@ grep(char *pattern, int fd)
       *q = 0;
       if(match(pattern, p)){
         *q = '\n';
-        write(1, p, q+1 - p);
+        xv6_write(1, p, q+1 - p);
       }
       p = q+1;
     }
@@ -43,24 +43,24 @@ main(int argc, char *argv[])
 
   if(argc <= 1){
     printf(2, "usage: grep pattern [file ...]\n");
-    exit();
+    xv6_exit();
   }
   pattern = argv[1];
 
   if(argc <= 2){
     grep(pattern, 0);
-    exit();
+    xv6_exit();
   }
 
   for(i = 2; i < argc; i++){
-    if((fd = open(argv[i], 0)) < 0){
+    if((fd = xv6_open(argv[i], 0)) < 0){
       printf(1, "grep: cannot open %s\n", argv[i]);
-      exit();
+      xv6_exit();
     }
     grep(pattern, fd);
-    close(fd);
+    xv6_close(fd);
   }
-  exit();
+  xv6_exit();
 }
 
 // Regexp matcher from Kernighan & Pike,

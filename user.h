@@ -2,27 +2,27 @@ struct stat;
 struct rtcdate;
 
 // system calls
-int fork(void);
-int exit(void) __attribute__((noreturn));
-int wait(void);
-int pipe(int*);
-int write(int, const void*, int);
-int read(int, void*, int);
-int close(int);
-int kill(int);
-int exec(char*, char**);
-int open(const char*, int);
-int mknod(const char*, short, short);
-int unlink(const char*);
-int fstat(int fd, struct stat*);
-int link(const char*, const char*);
-int mkdir(const char*);
-int chdir(const char*);
-int dup(int);
-int getpid(void);
-char* sbrk(int);
-int sleep(int);
-int uptime(void);
+int xv6_fork(void);
+int xv6_exit(void) __attribute__((noreturn));
+int xv6_wait(void);
+int xv6_pipe(int*);
+int xv6_write(int, const void*, int);
+int xv6_read(int, void*, int);
+int xv6_close(int);
+int xv6_kill(int);
+int xv6_exec(char*, char**);
+int xv6_open(const char*, int);
+int xv6_mknod(const char*, short, short);
+int xv6_unlink(const char*);
+int xv6_fstat(int fd, struct stat*);
+int xv6_link(const char*, const char*);
+int xv6_mkdir(const char*);
+int xv6_chdir(const char*);
+int xv6_dup(int);
+int xv6_getpid(void);
+char* xv6_sbrk(int);
+int xv6_sleep(int);
+int xv6_uptime(void);
 
 // ulib.c
 int stat(const char*, struct stat*);

@@ -66,7 +66,7 @@ runcmd(struct cmd *cmd)
   struct redircmd *rcmd;
 
   if(cmd == 0)
-    exit();
+    xv6_exit();
 
   switch(cmd->type){
   default:
@@ -75,17 +75,17 @@ runcmd(struct cmd *cmd)
   case EXEC:
     ecmd = (struct execcmd*)cmd;
     if(ecmd->argv[0] == 0)
-      exit();
-    exec(ecmd->argv[0], ecmd->argv);
+      xv6_exit();
+    xv6_exec(ecmd->argv[0], ecmd->argv);
     printf(2, "exec %s failed\n", ecmd->argv[0]);
     break;
 
   case REDIR:
     rcmd = (struct redircmd*)cmd;
-    close(rcmd->fd);
-    if(open(rcmd->file, rcmd->mode) < 0){
+    xv6_close(rcmd->fd);
+    if(xv6_open(rcmd->file, rcmd->mode) < 0){
       printf(2, "open %s failed\n", rcmd->file);
-      exit();
+      xv6_exit();
     }
     runcmd(rcmd->cmd);
     break;
@@ -94,32 +94,32 @@ runcmd(struct cmd *cmd)
     lcmd = (struct listcmd*)cmd;
     if(fork1() == 0)
       runcmd(lcmd->left);
-    wait();
+    xv6_wait();
     runcmd(lcmd->right);
     break;
 
   case PIPE:
     pcmd = (struct pipecmd*)cmd;
-    if(pipe(p) < 0)
+    if(xv6_pipe(p) < 0)
       panic("pipe");
     if(fork1() == 0){
-      close(1);
-      dup(p[1]);
-      close(p[0]);
-      close(p[1]);
+      xv6_close(1);
+      xv6_dup(p[1]);
+      xv6_close(p[0]);
+      xv6_close(p[1]);
       runcmd(pcmd->left);
     }
     if(fork1() == 0){
-      close(0);
-      dup(p[0]);
-      close(p[0]);
-      close(p[1]);
+      xv6_close(0);
+      xv6_dup(p[0]);
+      xv6_close(p[0]);
+      xv6_close(p[1]);
       runcmd(pcmd->right);
     }
-    close(p[0]);
-    close(p[1]);
-    wait();
-    wait();
+    xv6_close(p[0]);
+    xv6_close(p[1]);
+    xv6_wait();
+    xv6_wait();
     break;
 
   case BACK:
@@ -128,7 +128,7 @@ runcmd(struct cmd *cmd)
       runcmd(bcmd->cmd);
     break;
   }
-  exit();
+  xv6_exit();
 }
 
 int
@@ -149,9 +149,9 @@ main(void)
   int fd;
 
   // Ensure that three file descriptors are open.
-  while((fd = open("console", O_RDWR)) >= 0){
+  while((fd = xv6_open("console", O_RDWR)) >= 0){
     if(fd >= 3){
-      close(fd);
+      xv6_close(fd);
       break;
     }
   }
@@ -161,22 +161,22 @@ main(void)
     if(buf[0] == 'c' && buf[1] == 'd' && buf[2] == ' '){
       // Chdir must be called by the parent, not the child.
       buf[strlen(buf)-1] = 0;  // chop \n
-      if(chdir(buf+3) < 0)
+      if(xv6_chdir(buf+3) < 0)
         printf(2, "cannot cd %s\n", buf+3);
       continue;
     }
     if(fork1() == 0)
       runcmd(parsecmd(buf));
-    wait();
+    xv6_wait();
   }
-  exit();
+  xv6_exit();
 }
 
 void
 panic(char *s)
 {
   printf(2, "%s\n", s);
-  exit();
+  xv6_exit();
 }
 
 int
@@ -184,7 +184,7 @@ fork1(void)
 {
   int pid;
 
-  pid = fork();
+  pid = xv6_fork();
   if(pid == -1)
     panic("fork");
   return pid;

@@ -24,26 +24,26 @@ main(int argc, char *argv[])
   memset(data, 'a', sizeof(data));
 
   for(i = 0; i < 4; i++)
-    if(fork() > 0)
+    if(xv6_fork() > 0)
       break;
 
   printf(1, "write %d\n", i);
 
   path[8] += i;
-  fd = open(path, O_CREATE | O_RDWR);
+  fd = xv6_open(path, O_CREATE | O_RDWR);
   for(i = 0; i < 20; i++)
 //    printf(fd, "%d\n", i);
-    write(fd, data, sizeof(data));
-  close(fd);
+    xv6_write(fd, data, sizeof(data));
+  xv6_close(fd);
 
   printf(1, "read\n");
 
-  fd = open(path, O_RDONLY);
+  fd = xv6_open(path, O_RDONLY);
   for (i = 0; i < 20; i++)
-    read(fd, data, sizeof(data));
-  close(fd);
+    xv6_read(fd, data, sizeof(data));
+  xv6_close(fd);
 
-  wait();
+  xv6_wait();
 
-  exit();
+  xv6_exit();
 }

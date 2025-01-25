@@ -9,15 +9,15 @@ cat(int fd)
 {
   int n;
 
-  while((n = read(fd, buf, sizeof(buf))) > 0) {
-    if (write(1, buf, n) != n) {
+  while((n = xv6_read(fd, buf, sizeof(buf))) > 0) {
+    if (xv6_write(1, buf, n) != n) {
       printf(1, "cat: write error\n");
-      exit();
+      xv6_exit();
     }
   }
   if(n < 0){
     printf(1, "cat: read error\n");
-    exit();
+    xv6_exit();
   }
 }
 
@@ -28,16 +28,16 @@ main(int argc, char *argv[])
 
   if(argc <= 1){
     cat(0);
-    exit();
+    xv6_exit();
   }
 
   for(i = 1; i < argc; i++){
-    if((fd = open(argv[i], 0)) < 0){
+    if((fd = xv6_open(argv[i], 0)) < 0){
       printf(1, "cat: cannot open %s\n", argv[i]);
-      exit();
+      xv6_exit();
     }
     cat(fd);
-    close(fd);
+    xv6_close(fd);
   }
-  exit();
+  xv6_exit();
 }
