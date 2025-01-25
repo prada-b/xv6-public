@@ -1,3 +1,5 @@
+#include <stdbool.h>
+
 #include "types.h"
 #include "stat.h"
 #include "user.h"
@@ -23,7 +25,17 @@ fmtname(char *path)
 }
 
 void
-ls(char *path)
+print_dirent(char *path, struct stat st, bool show_hidden)
+{
+  if((fmtname(path)[0] == '.') && !show_hidden){
+    return;
+  }
+
+  printf(1, "%s %d %d %d\n", fmtname(path), st.type, st.ino, st.size);
+}
+
+void
+ls(char *path, bool show_hidden)
 {
   char buf[512], *p;
   int fd;
@@ -43,7 +55,7 @@ ls(char *path)
 
   switch(st.type){
   case T_FILE:
-    printf(1, "%s %d %d %d\n", fmtname(path), st.type, st.ino, st.size);
+    print_dirent(path, st, show_hidden);
     break;
 
   case T_DIR:
@@ -63,7 +75,7 @@ ls(char *path)
         printf(1, "ls: cannot stat %s\n", buf);
         continue;
       }
-      printf(1, "%s %d %d %d\n", fmtname(buf), st.type, st.ino, st.size);
+      print_dirent(buf, st, show_hidden);
     }
     break;
   }
@@ -74,12 +86,23 @@ int
 main(int argc, char *argv[])
 {
   int i;
+  int c;
+  bool show_hidden = false;
 
-  if(argc < 2){
-    ls(".");
+  for(i=1; i<argc; i++){
+    if(!strcmp(argv[i], "-a")){
+      show_hidden = true;
+    }
+    else{
+      break;
+    }
+  }
+
+  if(i == argc){
+    ls(".", show_hidden);
     xv6_exit();
   }
-  for(i=1; i<argc; i++)
-    ls(argv[i]);
+  for(; i<argc; i++)
+    ls(argv[i], show_hidden);
   xv6_exit();
 }
