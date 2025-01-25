@@ -8,7 +8,7 @@
 int
 main(void)
 {
-  if(xv6_fork() > 0)
-    xv6_sleep(5);  // Let child exit before parent.
-  xv6_exit();
+  if(fork() > 0)
+    sleep(5);  // Let child exit before parent.
+  exit();
 }

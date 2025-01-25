@@ -9,9 +9,9 @@ main(int argc, char **argv)
 
   if(argc < 2){
     printf(2, "usage: kill pid...\n");
-    xv6_exit();
+    exit();
   }
   for(i=1; i<argc; i++)
-    xv6_kill(atoi(argv[i]));
-  xv6_exit();
+    kill(atoi(argv[i]));
+  exit();
 }

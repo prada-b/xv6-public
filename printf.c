@@ -5,7 +5,7 @@
 static void
 putc(int fd, char c)
 {
-  xv6_write(fd, &c, 1);
+  write(fd, &c, 1);
 }
 
 static void

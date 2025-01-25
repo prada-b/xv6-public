@@ -9,15 +9,15 @@ main(int argc, char *argv[])
 
   if(argc < 2){
     printf(2, "Usage: mkdir files...\n");
-    xv6_exit();
+    exit();
   }
 
   for(i = 1; i < argc; i++){
-    if(xv6_mkdir(argv[i]) < 0){
+    if(mkdir(argv[i]) < 0){
       printf(2, "mkdir: %s failed to create\n", argv[i]);
       break;
     }
   }
 
-  xv6_exit();
+  exit();
 }

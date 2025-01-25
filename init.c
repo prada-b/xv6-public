@@ -12,26 +12,26 @@ main(void)
 {
   int pid, wpid;
 
-  if(xv6_open("console", O_RDWR) < 0){
-    xv6_mknod("console", 1, 1);
-    xv6_open("console", O_RDWR);
+  if(open("console", O_RDWR) < 0){
+    mknod("console", 1, 1);
+    open("console", O_RDWR);
   }
-  xv6_dup(0);  // stdout
-  xv6_dup(0);  // stderr
+  dup(0);  // stdout
+  dup(0);  // stderr
 
   for(;;){
     printf(1, "init: starting sh\n");
-    pid = xv6_fork();
+    pid = fork();
     if(pid < 0){
       printf(1, "init: fork failed\n");
-      xv6_exit();
+      exit();
     }
     if(pid == 0){
-      xv6_exec("sh", argv);
+      exec("sh", argv);
       printf(1, "init: exec sh failed\n");
-      xv6_exit();
+      exit();
     }
-    while((wpid=xv6_wait()) >= 0 && wpid != pid)
+    while((wpid=wait()) >= 0 && wpid != pid)
       printf(1, "zombie!\n");
   }
 }

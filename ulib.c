@@ -56,7 +56,7 @@ gets(char *buf, int max)
   char c;
 
   for(i=0; i+1 < max; ){
-    cc = xv6_read(0, &c, 1);
+    cc = read(0, &c, 1);
     if(cc < 1)
       break;
     buf[i++] = c;
@@ -73,11 +73,11 @@ stat(const char *n, struct stat *st)
   int fd;
   int r;
 
-  fd = xv6_open(n, O_RDONLY);
+  fd = open(n, O_RDONLY);
   if(fd < 0)
     return -1;
-  r = xv6_fstat(fd, st);
-  xv6_close(fd);
+  r = fstat(fd, st);
+  close(fd);
   return r;
 }
 

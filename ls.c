@@ -45,14 +45,14 @@ ls(char *path, bool show_hidden)
   struct dirent de;
   struct stat st;
 
-  if((fd = xv6_open(path, 0)) < 0){
+  if((fd = open(path, 0)) < 0){
     printf(2, "ls: cannot open %s\n", path);
     return;
   }
 
-  if(xv6_fstat(fd, &st) < 0){
+  if(fstat(fd, &st) < 0){
     printf(2, "ls: cannot stat %s\n", path);
-    xv6_close(fd);
+    close(fd);
     return;
   }
 
@@ -69,7 +69,7 @@ ls(char *path, bool show_hidden)
     strcpy(buf, path);
     p = buf+strlen(buf);
     *p++ = '/';
-    while(xv6_read(fd, &de, sizeof(de)) == sizeof(de)){
+    while(read(fd, &de, sizeof(de)) == sizeof(de)){
       if(de.inum == 0)
         continue;
       memmove(p, de.name, DIRSIZ);
@@ -82,7 +82,7 @@ ls(char *path, bool show_hidden)
     }
     break;
   }
-  xv6_close(fd);
+  close(fd);
 }
 
 int
@@ -109,9 +109,9 @@ main(int argc, char *argv[])
 
   if(i == argc){
     ls(".", show_hidden);
-    xv6_exit();
+    exit();
   }
   for(; i<argc; i++)
     ls(argv[i], show_hidden);
-  xv6_exit();
+  exit();
 }
