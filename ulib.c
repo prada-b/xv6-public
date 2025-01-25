@@ -33,6 +33,14 @@ strlen(const char *s)
   return n;
 }
 
+void
+strswp(char **a1, char **a2)
+{
+  char *temp = *a1;
+  *a1 = *a2;
+  *a2 = temp;
+}
+
 void*
 memset(void *dst, int c, uint n)
 {
@@ -103,4 +111,28 @@ memmove(void *vdst, const void *vsrc, int n)
   while(n-- > 0)
     *dst++ = *src++;
   return vdst;
+}
+
+int
+readline(int fd, char *line, int max_n)
+{
+  int i;
+  char c = '\0';
+
+  i = 0;
+  // Loop until EOL or buffer almost full
+  while(i < max_n-1 && c != '\n'){
+    // Read single char
+    // Break if EOF
+    if (read(fd, &c, 1) < 1) { break; }
+    
+    // Update buffer
+    line[i] = c;
+    i++;
+  }
+  // Null-terminate
+  line[i] = '\0';
+
+  // Number of chars read
+  return i;
 }
