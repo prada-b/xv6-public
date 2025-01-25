@@ -86,7 +86,6 @@ int
 main(int argc, char *argv[])
 {
   int i;
-  int c;
   bool show_hidden = false;
 
   for(i=1; i<argc; i++){
