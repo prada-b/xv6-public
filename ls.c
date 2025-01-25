@@ -1,12 +1,10 @@
-#include <stdbool.h>
-
 #include "types.h"
 #include "stat.h"
 #include "user.h"
 #include "fs.h"
 
 char*
-fmtname(char *path)
+fmtname(char *path, short type)
 {
   static char buf[DIRSIZ+1];
   char *p;
@@ -17,21 +15,26 @@ fmtname(char *path)
   p++;
 
   // Return blank-padded name.
-  if(strlen(p) >= DIRSIZ)
+  if(strlen(p) >= DIRSIZ){
     return p;
+  }
   memmove(buf, p, strlen(p));
   memset(buf+strlen(p), ' ', DIRSIZ-strlen(p));
+  // Mark if directory
+  if(type == T_DIR){
+    memset(buf+strlen(p), '/', 1);
+  }
   return buf;
 }
 
 void
 print_dirent(char *path, struct stat st, bool show_hidden)
 {
-  if((fmtname(path)[0] == '.') && !show_hidden){
+  char *path_name = fmtname(path, st.type);
+  if((path_name[0] == '.') && !show_hidden){
     return;
   }
-
-  printf(1, "%s %d %d %d\n", fmtname(path), st.type, st.ino, st.size);
+  printf(1, "%s %d %d %d\n", path_name, st.type, st.ino, st.size);
 }
 
 void
@@ -89,8 +92,15 @@ main(int argc, char *argv[])
   bool show_hidden = false;
 
   for(i=1; i<argc; i++){
-    if(!strcmp(argv[i], "-a")){
-      show_hidden = true;
+    if(argv[i][0] == '-'){
+      switch(argv[i][1]){
+      case 'a':
+        show_hidden = true;
+      break;
+      default:
+        printf(1, "undefined argument %c\n", argv[i][1]);
+        break;
+      }
     }
     else{
       break;
