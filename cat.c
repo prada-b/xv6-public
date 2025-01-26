@@ -27,7 +27,6 @@ main(int argc, char *argv[])
   int fd, i;
 
   if(argc <= 1){
-    cat(0);
     exit();
   }
 
@@ -37,6 +36,7 @@ main(int argc, char *argv[])
       exit();
     }
     cat(fd);
+    printf(1, "\n");
     close(fd);
   }
   exit();
