@@ -15,12 +15,21 @@ strcpy(char *s, const char *t)
   return os;
 }
 
-int
+bool
 strcmp(const char *p, const char *q)
 {
   while(*p && *p == *q)
     p++, q++;
-  return (uchar)*p - (uchar)*q;
+  return *p == *q;
+}
+
+bool
+strcmp_casefold(const char *p, const char *q)
+{
+  while (*p && *q && (*p | 32) == (*q | 32)){
+    p++, q++;
+  }
+  return *p == *q;
 }
 
 uint
@@ -113,18 +122,20 @@ memmove(void *vdst, const void *vsrc, int n)
   return vdst;
 }
 
-int
+bool
 readline(int fd, char *line, int max_n)
 {
   int i;
+  bool reading = true;
   char c = '\0';
 
   i = 0;
-  // Loop until EOL or buffer almost full
-  while(i < max_n-1 && c != '\n'){
+  while(true){
     // Read single char
-    // Break if EOF
-    if (read(fd, &c, 1) < 1) { break; }
+    // Break if...
+    if (read(fd, &c, 1) < 1) { reading = false; break; } // EOF
+    if (i == max_n-1)        { break; }             // Buffer almost full
+    if (c == '\n')           { break; }             // EOL
     
     // Update buffer
     line[i] = c;
@@ -133,6 +144,6 @@ readline(int fd, char *line, int max_n)
   // Null-terminate
   line[i] = '\0';
 
-  // Number of chars read
-  return i;
+  // Are there lines remaining to read?
+  return reading;
 }
