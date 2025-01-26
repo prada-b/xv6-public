@@ -28,17 +28,17 @@ fmtname(char *path, short type)
 }
 
 void
-print_dirent(char *path, struct stat st, bool show_hidden)
+print_dirent(char *path, struct stat st, bool opt_show_hidden)
 {
   char *path_name = fmtname(path, st.type);
-  if((path_name[0] == '.') && !show_hidden){
+  if((path_name[0] == '.') && !opt_show_hidden){
     return;
   }
   printf(1, "%s %d %d %d\n", path_name, st.type, st.ino, st.size);
 }
 
 void
-ls(char *path, bool show_hidden)
+ls(char *path, bool opt_show_hidden)
 {
   char buf[512], *p;
   int fd;
@@ -58,7 +58,7 @@ ls(char *path, bool show_hidden)
 
   switch(st.type){
   case T_FILE:
-    print_dirent(path, st, show_hidden);
+    print_dirent(path, st, opt_show_hidden);
     break;
 
   case T_DIR:
@@ -78,7 +78,7 @@ ls(char *path, bool show_hidden)
         printf(1, "ls: cannot stat %s\n", buf);
         continue;
       }
-      print_dirent(buf, st, show_hidden);
+      print_dirent(buf, st, opt_show_hidden);
     }
     break;
   }
@@ -89,13 +89,13 @@ int
 main(int argc, char *argv[])
 {
   int i;
-  bool show_hidden = false;
+  bool opt_show_hidden = false;
 
   for(i=1; i<argc; i++){
     if(argv[i][0] == '-'){
       switch(argv[i][1]){
       case 'a':
-        show_hidden = true;
+        opt_show_hidden = true;
       break;
       default:
         printf(1, "undefined argument %c\n", argv[i][1]);
@@ -107,11 +107,11 @@ main(int argc, char *argv[])
     }
   }
 
-  if(i == argc){
-    ls(".", show_hidden);
+  if(i >= argc){
+    ls(".", opt_show_hidden);
     exit();
   }
-  for(; i<argc; i++)
-    ls(argv[i], show_hidden);
+  for(; i < argc; i++)
+    ls(argv[i], opt_show_hidden);
   exit();
 }
