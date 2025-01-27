@@ -25,8 +25,10 @@ int
 main(int argc, char *argv[])
 {
   int fd, i;
-
+  
   if(argc <= 1){
+    // Used for piping
+    cat(0);
     exit();
   }
 
