@@ -62,7 +62,7 @@ ls(char *path, bool opt_show_hidden)
     break;
 
   case T_DIR:
-    if(strlen(path) + 1 + DIRSIZ + 1 > sizeof buf){
+    if(strlen(path) + 1 + DIRSIZ + 1 > sizeof(buf)){
       printf(1, "ls: path too long\n");
       break;
     }
@@ -73,7 +73,7 @@ ls(char *path, bool opt_show_hidden)
       if(de.inum == 0)
         continue;
       memmove(p, de.name, DIRSIZ);
-      p[DIRSIZ] = 0;
+      p[DIRSIZ] = '\0';
       if(stat(buf, &st) < 0){
         printf(1, "ls: cannot stat %s\n", buf);
         continue;
