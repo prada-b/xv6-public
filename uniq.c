@@ -31,7 +31,7 @@ uniq(int fd, bool opt_count, bool opt_repeated, bool opt_ignore_case)
     reading = readline(fd, line, LINE_SIZE);
    
     // If the new line matches the prev line...
-    if((opt_ignore_case && strcmp_casefold(prev_line, line)) || strcmp(prev_line, line)){
+    if((opt_ignore_case && strcmp_casefold(prev_line, line)) == 0 || strcmp(prev_line, line) == 0){
       // Increment count
       count++;
     }
@@ -81,7 +81,11 @@ main(int argc, char *argv[])
     }
   }
 
-  if(i >= argc) { exit(); }
+  if(i >= argc){
+    // Used for piping
+    uniq(0, opt_count, opt_repeated, opt_ignore_case);
+    exit();
+  }
 
   for(; i < argc; i++){
     if((fd = open(argv[i], 0)) < 0){
