@@ -31,7 +31,7 @@ uniq(int fd, bool opt_count, bool opt_repeated, bool opt_ignore_case)
     reading = readline(fd, line, LINE_SIZE);
    
     // If the new line matches the prev line...
-    if((opt_ignore_case && strcmp_casefold(prev_line, line)) == 0 || strcmp(prev_line, line) == 0){
+    if((opt_ignore_case && strcmp_casefold(prev_line, line) == 0) || strcmp(prev_line, line) == 0){
       // Increment count
       count++;
     }
