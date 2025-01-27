@@ -3,12 +3,16 @@
 #include "user.h"
 #include "fs.h"
 
+typedef enum { BOTH, FILE, DIR } opt_type_t;
+typedef enum { ALL, EQUAL, LESS, GREATER } opt_inum_t;
+
 #define PATH_SIZE 512
 char curr_path[PATH_SIZE];
 char curr_name[DIRSIZ];
 
 void
-find_hlpr(char *eop, char *name)
+find_hlpr(char *eop, char *name,
+          opt_type_t opt_type, opt_inum_t opt_inum, int inum, bool opt_printi)
 {
   int fd;
   struct dirent de;
@@ -23,8 +27,14 @@ find_hlpr(char *eop, char *name)
   switch(st.type){
   case T_FILE:
     // Print?
-    if (strcmp(curr_name, name) == 0)
+    if (strcmp(curr_name, name) == 0 &&
+        (opt_type == BOTH || opt_type == FILE) &&
+        (opt_inum == ALL || (opt_inum == EQUAL && st.ino == inum) ||
+                            (opt_inum == LESS && st.ino < inum)   ||
+                            (opt_inum == GREATER && st.ino > inum)))
     {
+      if (opt_printi) { printf(1, "%d ", st.ino); }
+
       printf(1, "%s\n", curr_path);
     }
     break;
@@ -35,8 +45,14 @@ find_hlpr(char *eop, char *name)
     *eop = '\0';
 
     // Print?
-    if (strcmp(curr_name, name) == 0)
+    if (strcmp(curr_name, name) == 0 &&
+        (opt_type == BOTH || opt_type == DIR) &&
+        (opt_inum == ALL || (opt_inum == EQUAL && st.ino == inum) ||
+                            (opt_inum == LESS && st.ino < inum)   ||
+                            (opt_inum == GREATER && st.ino > inum)))
     {
+      if (opt_printi) { printf(1, "%d ", st.ino); }
+
       printf(1, "%s\n", curr_path);
     }
       
@@ -67,7 +83,7 @@ find_hlpr(char *eop, char *name)
       strcpy(curr_name, de.name);
       
       // Recurse
-      find_hlpr(eop + strlen(de.name), name);
+      find_hlpr(eop + strlen(de.name), name, opt_type, opt_inum, inum, opt_printi);
     }
     
     close(fd);
@@ -78,7 +94,8 @@ find_hlpr(char *eop, char *name)
 }
 
 void
-find(char *path, char *name)
+find(char *path, char *name,
+     opt_type_t opt_type, opt_inum_t opt_inum, int inum, bool opt_printi)
 {
   char *eop = curr_path;
   
@@ -90,15 +107,20 @@ find(char *path, char *name)
   eop += strlen(path);
 
   // Call helper
-  find_hlpr(eop, name);
+  find_hlpr(eop, name, opt_type, opt_inum, inum, opt_printi);
 }
 
 int
 main(int argc, char *argv[])
 {
   int i;
-  char* path;
-  char* name = "";
+  char *path;
+  char *name = "";
+  char *p;
+  opt_type_t opt_type = BOTH;
+  opt_inum_t opt_inum = ALL;
+  bool opt_printi = false;
+  int inum = 0;
 
   if(argc < 3){
     printf(2, "usage: find <directory> -name <name>\n");
@@ -120,9 +142,38 @@ main(int argc, char *argv[])
         exit();
       }
     }
+    else if (strcmp(argv[i], "-type") == 0)
+    {
+      if (++i < argc)
+      {
+        if      (strcmp(argv[i], "f") == 0) { opt_type = FILE; }
+        else if (strcmp(argv[i], "d") == 0) { opt_type = DIR;  }
+      }
+    }
+    else if (strcmp(argv[i], "-inum") == 0)
+    {
+      if (++i < argc)
+      {
+        p = argv[i]; // For skipping sign char
+        if      (argv[i][0] == '-') { opt_inum = LESS;    p++; }
+        else if (argv[i][0] == '+') { opt_inum = GREATER; p++; }
+        else                        { opt_inum = EQUAL;        }
+        
+        inum = atoi(p);
+      }
+      else
+      {
+        printf(2, "-inum requires an argument\n");
+        exit();
+      }
+    }
+    else if (strcmp(argv[i], "-printi") == 0)
+    {
+      opt_printi = true;
+    }
   }
 
-  find(path, name);
+  find(path, name, opt_type, opt_inum, inum, opt_printi);
 
   exit();
 }
