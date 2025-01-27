@@ -15,21 +15,21 @@ strcpy(char *s, const char *t)
   return os;
 }
 
-bool
+int
 strcmp(const char *p, const char *q)
 {
-  while(*p && *p == *q)
+  while(*p != '\0' && *p == *q)
     p++, q++;
-  return *p == *q;
+  return *(unsigned char *)p - *(unsigned char *)q;
 }
 
-bool
+int
 strcmp_casefold(const char *p, const char *q)
 {
-  while (*p && *q && (*p | 32) == (*q | 32)){
+  while (*p != '\0' && *q != '\0' && (*p | 32) == (*q | 32)){
     p++, q++;
   }
-  return *p == *q;
+  return *(unsigned char *)p - *(unsigned char *)q;
 }
 
 uint
